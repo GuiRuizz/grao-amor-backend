@@ -1,20 +1,19 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-
-dotenv.config();
-
+import "dotenv/config";
+import productRoutes from "./api/productRoutes.js";
+console.log("SERVER INICIADO");
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-    res.json({ message: "API Ração Online funcionando 🚀" });
+app.get("/teste", (req, res) => {
+    res.send("Servidor funcionando");
 });
 
-const PORT = process.env.PORT || 3000;
+// Prefixo /v1 para versionamento da API
+ app.use("/v1/products", productRoutes);
 
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
+app.listen(process.env.PORT || 3001, () => {
+    console.log(`Server running on http://localhost:${process.env.PORT || 3001}`);
 });
