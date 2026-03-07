@@ -2,7 +2,8 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config";
 import productRoutes from "./api/productRoutes.js";
-console.log("SERVER INICIADO");
+import userRoutes from "./api/userRoutes.js";
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -12,7 +13,9 @@ app.get("/teste", (req, res) => {
 });
 
 // Prefixo /v1 para versionamento da API
- app.use("/v1/products", productRoutes);
+app.use("/v1/products", productRoutes);
+
+app.use("/v1/users", userRoutes);
 
 app.listen(process.env.PORT || 3001, () => {
     console.log(`Server running on http://localhost:${process.env.PORT || 3001}`);

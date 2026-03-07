@@ -90,8 +90,6 @@ export class ProductController {
                 return res.status(400).json({ message: "ID inválido" });
             }
 
-            const { name, brand, pricePerKg, stockKg } = req.body;
-
             await this.deleteProductUseCase.execute(id);
 
             res.status(204).send();
