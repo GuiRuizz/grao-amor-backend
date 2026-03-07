@@ -9,17 +9,18 @@ export function errorHandler(
     res: Response,
     next: NextFunction
 ) {
+    const logger = new Logger("ErrorHandler");
 
     if (error instanceof AppError) {
 
-        Logger.warn("ErrorHandler", error.message);
+        logger.warn(error.message);
 
         return res.status(error.statusCode).json({
             error: error.message
         });
     }
 
-    Logger.error("ErrorHandler", error.message, { stack: error.stack });
+    logger.error(error.message, { stack: error.stack });
 
     return res.status(500).json({
         error: "Internal server error"

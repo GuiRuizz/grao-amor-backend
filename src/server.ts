@@ -8,6 +8,7 @@ import { errorHandler } from "./utils/middleware/errorHandler.js";
 import { requestLogger } from "./utils/middleware/requestLogger.js";
 
 const app = express();
+const logger = new Logger("Server");
 app.use(cors());
 app.use(express.json());
 
@@ -23,5 +24,5 @@ app.use("/v1/users", userRoutes);
 app.use(errorHandler);
 
 app.listen(process.env.PORT || 3001, () => {
-    Logger.info("ServerStart", `Server running on http://localhost:${process.env.PORT || 3001}`);
+    logger.info(`Server running on http://localhost:${process.env.PORT || 3001}`);
 });

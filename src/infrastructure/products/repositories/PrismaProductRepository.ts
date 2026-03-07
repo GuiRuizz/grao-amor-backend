@@ -1,12 +1,14 @@
 import type { ProductDTO } from "../../../application/products/dto/ProductDTO.js";
 import { Product } from "../../../domain/products/entities/Product.js";
+import { createLogger } from "../../../utils/factories/LoggerFactory.js";
 import { prisma } from "../../database/db.js";
 
 
 export class PrismaProductRepository {
+    private logger = createLogger();
 
     async findAll(): Promise<Product[]> {
-        // Seleciona apenas os campos que interessam
+        this.logger.info("Buscando todos os produtos...");
         const data: ProductDTO[] = await prisma.product.findMany({
             select: {
                 id: true,
@@ -17,7 +19,7 @@ export class PrismaProductRepository {
             },
         });
 
-        // Converte DTO → Entidade de domínio
+        this.logger.info(`Encontrados ${data.length} produtos.`);
         return data.map(p => new Product(
             p.name,
             p.brand,
@@ -28,6 +30,7 @@ export class PrismaProductRepository {
     }
 
     async findById(id: string): Promise<Product | null> {
+        this.logger.info(`Buscando produto pelo ID: ${id}`);
         const p: ProductDTO | null = await prisma.product.findUnique({
             where: { id },
             select: {
@@ -39,24 +42,31 @@ export class PrismaProductRepository {
             },
         });
 
-        if (!p) return null;
+        if (!p) {
+            this.logger.warn(`Produto com ID ${id} não encontrado.`);
+            return null;
+        }
 
+        this.logger.info(`Produto com ID ${id} encontrado.`);
         return new Product(p.name, p.brand, p.pricePerKg, p.stockKg, p.id);
     }
 
     async create(product: Product): Promise<void> {
+        this.logger.info(`Criando produto: ${product.name}`);
         await prisma.product.create({
             data: {
-                id: product.id, // já deve ser UUID gerado pela entidade
+                id: product.id,
                 name: product.name,
                 brand: product.brand,
                 pricePerKg: product.pricePerKg,
                 stockKg: product.stockKg,
             },
         });
+        this.logger.info(`Produto ${product.name} criado com sucesso.`);
     }
 
     async update(id: string, product: Product): Promise<void> {
+        this.logger.info(`Atualizando produto ID ${id}...`);
         await prisma.product.update({
             where: { id },
             data: {
@@ -66,11 +76,14 @@ export class PrismaProductRepository {
                 stockKg: product.stockKg,
             },
         });
+        this.logger.info(`Produto ID ${id} atualizado.`);
     }
 
     async delete(id: string): Promise<void> {
+        this.logger.info(`Deletando produto ID ${id}...`);
         await prisma.product.delete({
             where: { id },
         });
+        this.logger.info(`Produto ID ${id} deletado.`);
     }
 }

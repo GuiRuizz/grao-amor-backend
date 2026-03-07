@@ -5,10 +5,12 @@ import { GetUserByEmailUseCase } from "../../application/users/use-cases/GetByEm
 import { GetUserByIdUseCase } from "../../application/users/use-cases/GetByIdProductUseCase.js";
 import { UpdateUserUseCase } from "../../application/users/use-cases/UpdateProductUseCase.js";
 import { PrismaUserRepository } from "../../infrastructure/users/repositories/PrismaUserRepository.js";
+import { Logger } from "../../utils/Logger.js";
 
 
 // Cria uma instância do repositório
 const userRepository = new PrismaUserRepository();
+const logger = new Logger("UserUsecaseFactory");
 
 // Cria instâncias de Use Cases
 export const createUserUseCase = new CreateUserUseCase(userRepository);
@@ -17,3 +19,6 @@ export const getUserByIdUseCase = new GetUserByIdUseCase(userRepository);
 export const updateUserUseCase = new UpdateUserUseCase(userRepository);
 export const deleteUserUseCase = new DeleteUserUseCase(userRepository);
 export const getUserByEmailUseCase = new GetUserByEmailUseCase(userRepository);
+
+logger .info("User Use Cases initialized successfully");
+    

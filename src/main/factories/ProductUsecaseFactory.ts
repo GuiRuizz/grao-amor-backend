@@ -5,9 +5,11 @@ import { GetProductByIdUseCase } from "../../application/products/use-cases/GetB
 import { UpdateProductUseCase } from "../../application/products/use-cases/UpdateProductUseCase.js";
 import { DeleteProductUseCase } from "../../application/products/use-cases/DeleteProductUseCase.js";
 import { PrismaProductRepository } from "../../infrastructure/products/repositories/PrismaProductRepository.js";
+import { Logger } from "../../utils/Logger.js";
 
 // Cria uma instância do repositório
 const productRepository = new PrismaProductRepository();
+const logger = new Logger("ProductUsecaseFactory");
 
 // Cria instâncias de Use Cases
 export const createProductUseCase = new CreateProductUseCase(productRepository);
@@ -15,3 +17,5 @@ export const getAllProductsUseCase = new GetAllProductsUseCase(productRepository
 export const getProductByIdUseCase = new GetProductByIdUseCase(productRepository);
 export const updateProductUseCase = new UpdateProductUseCase(productRepository);
 export const deleteProductUseCase = new DeleteProductUseCase(productRepository);
+
+logger.info("Product Use Cases initialized successfully");
