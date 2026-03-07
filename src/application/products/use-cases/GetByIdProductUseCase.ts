@@ -1,11 +1,10 @@
 import { Product } from "../../../domain/products/entities/Product.js"
 import type { IProductRepository } from "../../../domain/products/repositories/IProductRepository.js"
-import { createLogger } from "../../../utils/factories/LoggerFactory.js";
+import { Logger } from "../../../utils/Logger.js";
 
-
+const logger = new Logger("GetProductByIdUseCase");
 export class GetProductByIdUseCase {
     private productRepo: IProductRepository;
-    private logger = createLogger();
 
     constructor(productRepo: IProductRepository) {
         this.productRepo = productRepo;
@@ -14,7 +13,7 @@ export class GetProductByIdUseCase {
     async execute(id: string): Promise<Product | null> {
         // Validação simples
         if (!id || typeof id !== "string") {
-            this.logger.warn("Invalid ID provided");
+            logger.warn("Invalid ID provided");
             throw new Error("ID inválido.");
         }
 
@@ -22,11 +21,11 @@ export class GetProductByIdUseCase {
         const product = await this.productRepo.findById(id);
 
         if (!product) {
-            this.logger.info(`Product with ID ${id} not found`);
+            logger.info(`Product with ID ${id} not found`);
             throw new Error("Produto não encontrado.");
         }
 
-        this.logger.info(`Product with ID ${id} found`);
+        logger.info(`Product with ID ${id} found`);
         return product;
     }
 }

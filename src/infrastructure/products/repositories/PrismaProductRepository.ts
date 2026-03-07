@@ -1,11 +1,11 @@
 import type { ProductDTO } from "../../../application/products/dto/ProductDTO.js";
 import { Product } from "../../../domain/products/entities/Product.js";
-import { createLogger } from "../../../utils/factories/LoggerFactory.js";
+import { Logger } from "../../../utils/Logger.js";
 import { prisma } from "../../database/db.js";
 
 
 export class PrismaProductRepository {
-    private logger = createLogger();
+    private logger = new Logger("PrismaProductRepository");
 
     async findAll(): Promise<Product[]> {
         this.logger.info("Buscando todos os produtos...");

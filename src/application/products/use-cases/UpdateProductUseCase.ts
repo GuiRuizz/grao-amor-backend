@@ -1,11 +1,11 @@
 import { Product } from "../../../domain/products/entities/Product.js"
 import type { IProductRepository } from "../../../domain/products/repositories/IProductRepository.js"
-import { createLogger } from "../../../utils/factories/LoggerFactory.js";
+import { Logger } from "../../../utils/Logger.js";
 import type { ProductDTO } from "../dto/ProductDTO.js"
 
+const logger = new Logger("UpdateProductUseCase");
 export class UpdateProductUseCase {
     private productRepo: IProductRepository;
-    private logger = createLogger();
 
     constructor(productRepo: IProductRepository) {
         this.productRepo = productRepo;
@@ -14,12 +14,12 @@ export class UpdateProductUseCase {
     async execute(id: string, data: ProductDTO): Promise<Product> {
         // Validação básica
         if (!id || typeof id !== "string") {
-                this.logger.warn("Invalid ID provided");
+            logger.warn("Invalid ID provided");
             throw new Error("ID inválido.");
         }
 
         if (!data || Object.keys(data).length === 0) {
-            this.logger.warn("No data provided for update");
+            logger.warn("No data provided for update");
             throw new Error("Nenhum dado para atualizar.");
         }
 
@@ -27,7 +27,7 @@ export class UpdateProductUseCase {
         const product = await this.productRepo.findById(id);
 
         if (!product) {
-            this.logger.info(`Product with ID ${id} not found`);
+            logger.info(`Product with ID ${id} not found`);
             throw new Error("Produto não encontrado.");
         }
 
@@ -37,7 +37,7 @@ export class UpdateProductUseCase {
         // Salva no repositório
         await this.productRepo.update(id, updatedProduct);
 
-        this.logger.info(`Product with ID ${id} updated successfully`);
+        logger.info(`Product with ID ${id} updated successfully`);
 
         return updatedProduct;
     }

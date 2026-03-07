@@ -1,11 +1,11 @@
 import { prisma } from "../../database/db.js";
 import { User } from "../../../domain/users/entities/User.js";
 import type { IUserRepository } from "../../../domain/users/repositories/IUserRepository.js";
-import { createLogger } from "../../../utils/factories/LoggerFactory.js";
+import { Logger } from "../../../utils/Logger.js";
 
+const logger = new Logger("PrismaUserRepository");
 export class PrismaUserRepository implements IUserRepository {
 
-    private logger = createLogger();
 
     async create(user: User): Promise<void> {
         await prisma.user.create({
@@ -16,7 +16,7 @@ export class PrismaUserRepository implements IUserRepository {
                 password: user.password
             }
         });
-        this.logger.info(`User with email ${user.email} created successfully in the database`);
+        logger.info(`User with email ${user.email} created successfully in the database`);
     }
 
     async findByEmail(email: string): Promise<User | null> {
@@ -26,7 +26,7 @@ export class PrismaUserRepository implements IUserRepository {
 
         if (!user) return null;
 
-        this.logger.info(`User with email ${email} retrieved successfully from the database`);
+        logger.info(`User with email ${email} retrieved successfully from the database`);
 
         return new User(
             user.name,
@@ -43,7 +43,7 @@ export class PrismaUserRepository implements IUserRepository {
 
         if (!user) return null;
 
-        this.logger.info(`User with ID ${id} retrieved successfully from the database`);
+        logger.info(`User with ID ${id} retrieved successfully from the database`);
 
         return new User(
             user.name,
@@ -56,7 +56,7 @@ export class PrismaUserRepository implements IUserRepository {
     async findAll(): Promise<User[]> {
         const users = await prisma.user.findMany();
 
-        this.logger.info(`Retrieved ${users.length} users from the database`);
+        logger.info(`Retrieved ${users.length} users from the database`);
 
         return users.map(u =>
             new User(
@@ -66,7 +66,7 @@ export class PrismaUserRepository implements IUserRepository {
                 u.id
             ),
 
-            this.logger.info(`Mapped ${users.length} users to User entities`)
+            logger.info(`Mapped ${users.length} users to User entities`)
         );
     }
 
@@ -74,7 +74,7 @@ export class PrismaUserRepository implements IUserRepository {
         await prisma.user.delete({
             where: { id }
         });
-        this.logger.info(`User with ID ${id} deleted successfully`);
+        logger.info(`User with ID ${id} deleted successfully`);
     }
 
     async update(id: string, user: User): Promise<void> {
@@ -85,6 +85,6 @@ export class PrismaUserRepository implements IUserRepository {
                 email: user.email,
             }
         });
-        this.logger.info(`User with ID ${id} updated successfully`);
+        logger.info(`User with ID ${id} updated successfully`);
     }
 }

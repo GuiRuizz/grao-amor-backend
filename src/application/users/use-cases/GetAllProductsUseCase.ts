@@ -1,12 +1,14 @@
 import type { IUserRepository } from "../../../domain/users/repositories/IUserRepository.js";
-import type { Logger } from "../../../utils/Logger.js";
+import { Logger } from "../../../utils/Logger.js";
+
+const logger = new Logger("GetAllUsersUseCase");
 
 export class GetAllUsersUseCase {
 
-    constructor(private repository: IUserRepository, private logger: Logger) { }
+    constructor(private repository: IUserRepository) { }
 
     async execute() {
-        this.logger.info("Retrieving all users");
+        logger.info("Retrieving all users");
         return await this.repository.findAll()
     }
 }

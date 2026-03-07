@@ -3,19 +3,19 @@ import { User } from "../../../domain/users/entities/User.js";
 import type { IUserRepository } from "../../../domain/users/repositories/IUserRepository.js";
 import type { CreateUserDTO } from "../dto/UserDTO.js";
 import { AppError } from "../../../utils/AppError.js";
-import type { Logger } from "../../../utils/Logger.js";
+import { Logger } from "../../../utils/Logger.js";
 
-
+const logger = new Logger("CreateUserUseCase");
 export class CreateUserUseCase {
 
-  constructor(private userRepository: IUserRepository, private logger: Logger) { }
+  constructor(private userRepository: IUserRepository) { }
 
   async execute(data: CreateUserDTO): Promise<User> {
 
     const userExists = await this.userRepository.findByEmail(data.email);
 
     if (userExists) {
-      this.logger.warn(`Attempt to create user with existing email: ${data.email}`);
+      logger.warn(`Attempt to create user with existing email: ${data.email}`);
       throw new AppError("Email já cadastrado.", 409);
     }
 
@@ -29,7 +29,7 @@ export class CreateUserUseCase {
 
     await this.userRepository.create(user);
 
-    this.logger.info(`User with email ${data.email} created successfully`);
+    logger.info(`User with email ${data.email} created successfully`);
 
     return user;
   }
