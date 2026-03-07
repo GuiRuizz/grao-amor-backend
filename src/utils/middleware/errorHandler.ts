@@ -12,7 +12,7 @@ export function errorHandler(
 
     if (error instanceof AppError) {
 
-        Logger.error("ErrorHandler", error.message);
+        Logger.warn("ErrorHandler", error.message);
 
         return res.status(error.statusCode).json({
             error: error.message

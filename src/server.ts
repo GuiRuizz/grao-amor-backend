@@ -5,6 +5,7 @@ import productRoutes from "./api/productRoutes.js";
 import userRoutes from "./api/userRoutes.js";
 import { Logger } from "./utils/Logger.js";
 import { errorHandler } from "./utils/middleware/errorHandler.js";
+import { requestLogger } from "./utils/middleware/requestLogger.js";
 
 const app = express();
 app.use(cors());
@@ -13,7 +14,7 @@ app.use(express.json());
 app.get("/teste", (req, res) => {
     res.send("Servidor funcionando");
 });
-
+app.use(requestLogger);
 // Prefixo /v1 para versionamento da API
 app.use("/v1/products", productRoutes);
 
