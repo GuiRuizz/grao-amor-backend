@@ -1,6 +1,6 @@
 import type { User } from "../../../domain/users/entities/User.js";
 import type { IUserRepository } from "../../../domain/users/repositories/IUserRepository.js";
-import type { UserDTO } from "../dto/UserDTO.js";
+import type { UserResponseDTO } from "../dto/UserDTO.js";
 
 export class UpdateUserUseCase {
     private userRepo: IUserRepository;
@@ -9,7 +9,7 @@ export class UpdateUserUseCase {
         this.userRepo = userRepo;
     }
 
-    async execute(id: string, data: UserDTO): Promise<User | null> {
+    async execute(id: string, data: UserResponseDTO): Promise<User | null> {
         // Validação básica
         if (!id || typeof id !== "string") {
             throw new Error("ID inválido.");

@@ -19,91 +19,75 @@ export class UserController {
     ) { }
 
     async create(req: Request, res: Response) {
-        try {
 
-            const { name, email, password } = req.body;
 
-            const user = await this.createUserUseCase.execute({
-                name,
-                email,
-                password
-            });
+        const { name, email, password } = req.body;
 
-            return res.status(201).json(toUserResponse(user));
+        const user = await this.createUserUseCase.execute({
+            name,
+            email,
+            password
+        });
 
-        } catch (error) {
-            if (error instanceof AppError) {
-                return res.status(error.statusCode).json({
-                    error: error.message
-                });
-            }
-            console.error(error);
-            return res.status(500).json({ error: "Internal error" });
-        }
+        return res.status(201).json(toUserResponse(user));
+
+
     }
 
     async getAll(req: Request, res: Response) {
-        try {
-            const users = await this.getAllUsersUseCase.execute()
-            res.status(200).json(users)
-        } catch (error) {
-            res.status(500).json({ error: "Internal error" })
-        }
+
+        const users = await this.getAllUsersUseCase.execute()
+        res.status(200).json(users.map(toUserResponse))
+
     }
 
     async getById(req: Request, res: Response) {
-        try {
-            const id = req.params.id;
 
-            if (!id || Array.isArray(id)) {
-                return res.status(400).json({ message: "ID inválido" });
-            }
+        const id = req.params.id;
 
-            const user = await this.getUserByIdUseCase.execute(id);
-
-            if (!user) {
-                return res.status(404).json({ message: "Usuário não encontrado." });
-            }
-
-            return res.json(user);
-        } catch (error: any) {
-            return res.status(400).json({ message: error.message });
+        if (!id || Array.isArray(id)) {
+            return res.status(400).json({ message: "ID inválido" });
         }
+
+        const user = await this.getUserByIdUseCase.execute(id);
+
+        if (!user) {
+            return res.status(404).json({ message: "Usuário não encontrado." });
+        }
+
+        return res.json(toUserResponse(user));
+
     }
 
     async update(req: Request, res: Response) {
-        try {
-            const id = req.params.id;
 
-            if (!id || Array.isArray(id)) {
-                return res.status(400).json({ message: "ID inválido" });
-            }
+        const id = req.params.id;
 
-            const data = req.body; // { name, price, description ... }
-
-            const updatedUser = await this.updateUserUseCase.execute(id, data);
-
-            return res.json({ message: "Usuário atualizado com sucesso", user: updatedUser });
-
-        } catch (error: any) {
-            return res.status(400).json({ message: error.message });
+        if (!id || Array.isArray(id)) {
+            return res.status(400).json({ message: "ID inválido" });
         }
+
+        const data = req.body; // { name, price, description ... }
+
+        const updatedUser = await this.updateUserUseCase.execute(id, data);
+
+        return res.json({ message: "Usuário atualizado com sucesso", user: toUserResponse(updatedUser!) });
+
+
     }
 
     async delete(req: Request, res: Response) {
-        try {
-            const id = req.params.id;
 
-            if (!id || Array.isArray(id)) {
-                return res.status(400).json({ message: "ID inválido" });
-            }
+        const id = req.params.id;
 
-            await this.deleteUserUseCase.execute(id);
-
-            res.status(204).send();
-        } catch (error) {
-            res.status(500).json({ error: "Internal error" });
+        if (!id || Array.isArray(id)) {
+            return res.status(400).json({ message: "ID inválido" });
         }
+
+        await this.deleteUserUseCase.execute(id);
+
+        res.status(204).send();
+
 
     }
 }
