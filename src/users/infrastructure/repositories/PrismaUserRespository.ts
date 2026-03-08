@@ -33,6 +33,10 @@ export class PrismaUserRepository implements IUserRepository {
             user.name,
             user.email,
             user.password,
+            user.type as "USER" | "ADMIN",
+            user.isActive,
+            user.createdAt,
+            user.updatedAt,
             user.id
         );
     }
@@ -50,7 +54,12 @@ export class PrismaUserRepository implements IUserRepository {
             user.name,
             user.email,
             user.password,
-            user.id
+            user.type as "USER" | "ADMIN",
+            user.isActive,
+            user.createdAt,
+            user.updatedAt,
+            user.id,
+            
         );
     }
 
@@ -64,6 +73,10 @@ export class PrismaUserRepository implements IUserRepository {
                 u.name,
                 u.email,
                 u.password,
+                u.type as "USER" | "ADMIN",
+                u.isActive,
+                u.createdAt,
+                u.updatedAt,
                 u.id
             ),
 
@@ -87,5 +100,15 @@ export class PrismaUserRepository implements IUserRepository {
             }
         });
         logger.info(`User with ID ${id} updated successfully`);
+    }
+
+    async updatePassword(id: string, password: string): Promise<void> {
+        await prisma.user.update({
+            where: { id },
+            data: {
+                password
+            }
+        });
+        logger.info(`Password for user with ID ${id} updated successfully`);
     }
 }

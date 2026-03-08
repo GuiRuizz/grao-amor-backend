@@ -1,12 +1,13 @@
 import type { Request, Response } from "express"
 import type { CreateUserUseCase } from "../../../../users/application/use-cases/CreateUserUseCase.js"
-import type { DeleteUserUseCase } from "../../../../users/application/use-cases/DeleteProductUseCase.js"
-import type { GetAllUsersUseCase } from "../../../../users/application/use-cases/GetAllProductsUseCase.js"
-import type { GetUserByIdUseCase } from "../../../../users/application/use-cases/GetByIdProductUseCase.js"
-import type { UpdateUserUseCase } from "../../../../users/application/use-cases/UpdateProductUseCase.js"
+import type { DeleteUserUseCase } from "../../../application/use-cases/DeleteUserUseCase.js"
+import type { GetAllUsersUseCase } from "../../../application/use-cases/GetAllUsersUseCase.js"
+import type { GetUserByIdUseCase } from "../../../application/use-cases/GetByIdUserUseCase.js"
+import type { UpdateUserUseCase } from "../../../application/use-cases/UpdateUserUseCase.js"
 
 import { Logger } from "../../../../utils/Logger.js"
 import { toUserResponse } from "../../../application/dto/MapperUser.js"
+import type { GetUserByEmailUseCase } from "../../../application/use-cases/GetByEmailUserUseCase.js"
 const logger = new Logger("UserController");
 export class UserController {
 
@@ -16,6 +17,7 @@ export class UserController {
         private getUserByIdUseCase: GetUserByIdUseCase,
         private updateUserUseCase: UpdateUserUseCase,
         private deleteUserUseCase: DeleteUserUseCase,
+        private getUserByEmailUseCase: GetUserByEmailUseCase
     ) {
     }
 
@@ -98,5 +100,22 @@ export class UserController {
 
         res.status(204).send();
 
+    }
+
+    async getByEmail(req: Request, res: Response) {
+
+        const email = req.params.email;
+        if (!email || Array.isArray(email)) {
+            logger.warn("Invalid email provided");
+            return res.status(400).json({ message: "Email inválido" });
+        }
+        const user = await this.getUserByEmailUseCase.execute(email);
+
+        if (!user) {
+            logger.info(`User with email ${email} not found`);
+            return res.status(404).json({ message: "Usuário não encontrado." });
+        }
+        logger.info(`User with email ${email} retrieved successfully`);
+        return res.json(toUserResponse(user));
     }
 }

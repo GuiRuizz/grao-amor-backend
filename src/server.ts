@@ -6,6 +6,7 @@ import userRoutes from "./api/userRoutes.js";
 import { Logger } from "./utils/Logger.js";
 import { errorHandler } from "./utils/middleware/errorHandler.js";
 import { requestLogger } from "./utils/middleware/requestLogger.js";
+import authRoutes from "./api/authRoutes.js";
 
 const app = express();
 const logger = new Logger("Server");
@@ -20,6 +21,8 @@ app.use(requestLogger);
 app.use("/v1/products", productRoutes);
 
 app.use("/v1/users", userRoutes);
+
+app.use("/v1/auth", authRoutes);
 
 app.use(errorHandler);
 
