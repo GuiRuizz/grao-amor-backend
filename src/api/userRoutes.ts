@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { UserController } from "../infrastructure/users/http/controllers/UserConroller.js";
-import { createUserUseCase, deleteUserUseCase, getAllUsersUseCase, getUserByIdUseCase, updateUserUseCase } from "../main/factories/UserUsecaseFactory.js";
+import { UserController } from "../users/infrastructure/http/controllers/UserController.js";
+import { createUserUseCase, getAllUsersUseCase, getUserByIdUseCase, updateUserUseCase, deleteUserUseCase } from "../users/factories/UserUsecaseFactory.js";
 
 const router = Router();
 

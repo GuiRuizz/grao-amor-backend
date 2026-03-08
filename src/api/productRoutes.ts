@@ -1,7 +1,7 @@
 import { Router } from "express";
+import { ProductController } from "../products/infrastructure/http/controllers/ProductController.js";
+import { createProductUseCase, getAllProductsUseCase, getProductByIdUseCase, updateProductUseCase, deleteProductUseCase } from "../products/factories/ProductUsecaseFactory.js";
 
-import { ProductController } from "../infrastructure/products/http/controllers/ProductController.js";
-import { createProductUseCase, deleteProductUseCase, getAllProductsUseCase, getProductByIdUseCase, updateProductUseCase } from "../main/factories/ProductUsecaseFactory.js";
 
 const router = Router();
 
