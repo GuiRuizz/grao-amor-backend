@@ -19,6 +19,12 @@ model Product {
   brand      String
   pricePerKg Float
   stockKg    Float
+  description String?
+  imageUrl    String?
+  isActive    Boolean @default(true)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
 }
 
 model User {
@@ -42,4 +48,14 @@ model RefreshToken {
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   expiresAt DateTime
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  description String
+  products    Product[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

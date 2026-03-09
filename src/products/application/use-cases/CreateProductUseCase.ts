@@ -1,7 +1,9 @@
+import { AppError } from "../../../utils/AppError.js";
 import { Logger } from "../../../utils/Logger.js";
 import { Product } from "../../domain/entities/Product.js";
 import type { IProductRepository } from "../../domain/repositories/IProductRepository.js";
 import type { ProductDTO } from "../dto/ProductDTO.js"
+import { ProductMapper } from "../mappers/ProductMappers.js";
 
 const logger = new Logger("CreateProductUseCase");
 export class CreateProductUseCase {
@@ -12,22 +14,22 @@ export class CreateProductUseCase {
 
     if (data.pricePerKg <= 0) {
       logger.warn(`Invalid price per kg: ${data.pricePerKg}`);
-      throw new Error("Preço inválido")
+      throw new AppError("Preço inválido")
     }
 
     if (data.stockKg < 0) {
       logger.warn(`Invalid stock kg: ${data.stockKg}`);
-      throw new Error("Estoque inválido")
+      throw new AppError("Estoque inválido")
     }
 
-    const product = new Product(
-      data.name,
-      data.brand,
-      data.pricePerKg,
-      data.stockKg
-    )
+    if (!data.name || !data.brand || !data.categoryId) {
+      logger.warn("Missing required fields: name, brand, or categoryId");
+      throw new AppError("Campos obrigatórios faltando: nome, marca ou categoriaId")
+    }
 
-    await this.repository.create(product)
+    const product = ProductMapper.toDomain(data);
+
+    await this.repository.create(product);
 
     logger.info(`Product created: ${product.name} (${product.id})`)
 

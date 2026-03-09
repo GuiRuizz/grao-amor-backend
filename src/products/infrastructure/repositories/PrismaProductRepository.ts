@@ -9,48 +9,48 @@ import type { ProductDTO } from "../../application/dto/ProductDTO.js";
 export class PrismaProductRepository {
     private logger = new Logger("PrismaProductRepository");
 
-    async findAll(): Promise<Product[]> {
+    async findAll(): Promise<any[]> {
         this.logger.info("Buscando todos os produtos...");
-        const data: ProductDTO[] = await prisma.product.findMany({
-            select: {
-                id: true,
-                name: true,
-                brand: true,
-                pricePerKg: true,
-                stockKg: true,
-            },
+
+        const data = await prisma.product.findMany({
+            include: {
+                category: {
+                    select: {
+                        id: false,
+                        name: true,
+                        description: true
+                    }
+                }
+            }
         });
 
         this.logger.info(`Encontrados ${data.length} produtos.`);
-        return data.map(p => new Product(
-            p.name,
-            p.brand,
-            p.pricePerKg,
-            p.stockKg,
-            p.id
-        ));
+
+        return data;
     }
 
-    async findById(id: string): Promise<Product | null> {
+    async findById(id: string): Promise<any | null> {
         this.logger.info(`Buscando produto pelo ID: ${id}`);
-        const p: ProductDTO | null = await prisma.product.findUnique({
+
+        const product = await prisma.product.findUnique({
             where: { id },
-            select: {
-                id: true,
-                name: true,
-                brand: true,
-                pricePerKg: true,
-                stockKg: true,
-            },
+            include: {
+                category: {
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true
+                    }
+                }
+            }
         });
 
-        if (!p) {
+        if (!product) {
             this.logger.warn(`Produto com ID ${id} não encontrado.`);
             return null;
         }
 
-        this.logger.info(`Produto com ID ${id} encontrado.`);
-        return new Product(p.name, p.brand, p.pricePerKg, p.stockKg, p.id);
+        return product;
     }
 
     async create(product: Product): Promise<void> {
@@ -62,6 +62,7 @@ export class PrismaProductRepository {
                 brand: product.brand,
                 pricePerKg: product.pricePerKg,
                 stockKg: product.stockKg,
+                categoryId: product.categoryId,
             },
         });
         this.logger.info(`Produto ${product.name} criado com sucesso.`);
@@ -76,6 +77,7 @@ export class PrismaProductRepository {
                 brand: product.brand,
                 pricePerKg: product.pricePerKg,
                 stockKg: product.stockKg,
+                categoryId: product.categoryId,
             },
         });
         this.logger.info(`Produto ID ${id} atualizado.`);

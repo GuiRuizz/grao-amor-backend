@@ -4,4 +4,5 @@ export interface ProductDTO {
     brand: string;
     pricePerKg: number;
     stockKg: number;
+    categoryId: string; // ID da categoria
 }

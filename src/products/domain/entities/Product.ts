@@ -9,6 +9,7 @@ export class Product {
         public brand: string,
         public pricePerKg: number,
         public stockKg: number,
+        public categoryId: string,
         id?: string
     ) {
         this.id = id || uuidv4(); // usa o ID passado ou gera um novo
@@ -16,6 +17,7 @@ export class Product {
         this.brand = brand;
         this.pricePerKg = pricePerKg;
         this.stockKg = stockKg;
+        this.categoryId = categoryId;
     }
     
 }

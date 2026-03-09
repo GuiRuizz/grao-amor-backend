@@ -7,6 +7,7 @@ import { Logger } from "./utils/Logger.js";
 import { errorHandler } from "./utils/middleware/errorHandler.js";
 import { requestLogger } from "./utils/middleware/requestLogger.js";
 import authRoutes from "./api/authRoutes.js";
+import categoryRoutes from "./api/categoryRoutes.js";
 
 const app = express();
 const logger = new Logger("Server");
@@ -19,6 +20,8 @@ app.get("/teste", (req, res) => {
 app.use(requestLogger);
 // Prefixo /v1 para versionamento da API
 app.use("/v1/products", productRoutes);
+
+app.use("/v1/categories", categoryRoutes);
 
 app.use("/v1/users", userRoutes);
 

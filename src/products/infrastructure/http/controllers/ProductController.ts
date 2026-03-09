@@ -6,6 +6,7 @@ import type { DeleteProductUseCase } from "../../../application/use-cases/Delete
 import type { GetAllProductsUseCase } from "../../../application/use-cases/GetAllProductsUseCase.js";
 import type { GetProductByIdUseCase } from "../../../application/use-cases/GetByIdProductUseCase.js";
 import type { UpdateProductUseCase } from "../../../application/use-cases/UpdateProductUseCase.js";
+import { ProductMapper } from "../../../application/mappers/ProductMappers.js";
 
 
 const logger = new Logger("ProductController");
@@ -21,13 +22,14 @@ export class ProductController {
 
     async create(req: Request, res: Response) {
 
-        const { name, brand, pricePerKg, stockKg } = req.body
+        const { name, brand, pricePerKg, stockKg, categoryId } = req.body
 
         const product = await this.createProductUseCase.execute({
             name,
             brand,
             pricePerKg,
-            stockKg
+            stockKg,
+            categoryId
         })
         logger.info(`Product with name ${name} created successfully`);
 
@@ -40,8 +42,10 @@ export class ProductController {
 
         const products = await this.getAllProductsUseCase.execute()
         logger.info(`Retrieved ${products.length} products successfully`);
-        res.status(200).json(products)
 
+        const response = products.map(ProductMapper.toResponse)
+
+        return res.json(response)
     }
 
     async getById(req: Request, res: Response) {
