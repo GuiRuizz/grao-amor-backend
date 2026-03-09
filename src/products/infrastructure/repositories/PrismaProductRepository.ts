@@ -25,25 +25,34 @@ export class PrismaProductRepository {
             }
         }
 
-        if (filters?.minPrice) {
-            where.pricePerKg = { gte: filters.minPrice }
+        if (filters?.minPrice || filters?.maxPrice) {
+            where.pricePerKg = {}
+
+            if (filters.minPrice) {
+                where.pricePerKg.gte = filters.minPrice
+            }
+
+            if (filters.maxPrice) {
+                where.pricePerKg.lte = filters.maxPrice
+            }
         }
 
-        if (filters?.maxPrice) {
-            where.pricePerKg = { ...where.pricePerKg, lte: filters.maxPrice }
-        }
+        const page = filters?.page ?? 1
+        const limit = filters?.limit ?? 10
 
         const products = await prisma.product.findMany({
             where,
             include: {
                 category: {
                     select: {
-                        id: false,
+                        id: true,
                         name: true,
                         description: true
                     }
                 }
-            }
+            },
+            skip: (page - 1) * limit,
+            take: limit
         })
 
         this.logger.info(`Encontrados ${products.length} produtos.`);

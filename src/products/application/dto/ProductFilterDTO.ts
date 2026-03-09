@@ -4,4 +4,6 @@ export interface ProductFilterDTO {
     minPrice?: number
     maxPrice?: number
     search?: string
+    page?: number
+    limit?: number
 }

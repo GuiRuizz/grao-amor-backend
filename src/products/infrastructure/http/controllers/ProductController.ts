@@ -40,13 +40,15 @@ export class ProductController {
 
     async getAll(req: Request, res: Response) {
 
-        const { category, brand, minPrice, maxPrice } = req.query;
+        const { category, brand, minPrice, maxPrice, search, page, limit } = req.query;
         const products = await this.getAllProductsUseCase.execute({
             categoryId: category as string | undefined,
             brand: brand as string | undefined,
             minPrice: minPrice ? Number(minPrice) : undefined,
             maxPrice: maxPrice ? Number(maxPrice) : undefined,
-            search: req.query.search as string | undefined
+            search: search as string | undefined,
+            page: page ? Number(page) : 1,
+            limit: limit ? Number(limit) : 10
         })
         logger.info(`Retrieved ${products.length} products successfully`);
 
@@ -70,9 +72,12 @@ export class ProductController {
             logger.info(`Product with ID ${id} not found`);
             return res.status(404).json({ message: "Produto não encontrado." });
         }
+        
+        const response = ProductMapper.toResponse(product);
+
 
         logger.info(`Product with ID ${id} retrieved successfully`);
-        return res.json(product);
+        return res.json(response);
 
     }
 
