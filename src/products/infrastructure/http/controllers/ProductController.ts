@@ -40,7 +40,14 @@ export class ProductController {
 
     async getAll(req: Request, res: Response) {
 
-        const products = await this.getAllProductsUseCase.execute()
+        const { category, brand, minPrice, maxPrice } = req.query;
+        const products = await this.getAllProductsUseCase.execute({
+            categoryId: category as string | undefined,
+            brand: brand as string | undefined,
+            minPrice: minPrice ? Number(minPrice) : undefined,
+            maxPrice: maxPrice ? Number(maxPrice) : undefined,
+            search: req.query.search as string | undefined
+        })
         logger.info(`Retrieved ${products.length} products successfully`);
 
         const response = products.map(ProductMapper.toResponse)
@@ -82,8 +89,16 @@ export class ProductController {
 
         const updatedProduct = await this.updateProductUseCase.execute(id, data);
         logger.info(`Product with ID ${id} updated successfully`);
+        const product = await this.getProductByIdUseCase.execute(id);
 
-        return res.json({ message: "Produto atualizado com sucesso", product: updatedProduct });
+        if (!product) {
+            logger.info(`Product with ID ${id} not found`);
+            return res.status(404).json({ message: "Produto não encontrado." });
+        }
+        const response = ProductMapper.toResponse(product);
+
+
+        return res.json({ message: "Produto atualizado com sucesso", product: response });
 
     }
 

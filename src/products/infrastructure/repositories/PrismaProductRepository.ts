@@ -2,17 +2,39 @@
 import { Product } from "../../domain/entities/Product.js";
 import { Logger } from "../../../utils/Logger.js";
 import { prisma } from "../../../infrastructure/database/db.js";
-import type { ProductDTO } from "../../application/dto/ProductDTO.js";
+import type { ProductFilterDTO } from "../../application/dto/ProductFilterDTO.js";
 
 
 
 export class PrismaProductRepository {
     private logger = new Logger("PrismaProductRepository");
 
-    async findAll(): Promise<any[]> {
+    async findAll(filters?: ProductFilterDTO) {
         this.logger.info("Buscando todos os produtos...");
 
-        const data = await prisma.product.findMany({
+        const where: any = {}
+
+        if (filters?.categoryId) {
+            where.categoryId = filters.categoryId
+        }
+
+        if (filters?.brand) {
+            where.brand = {
+                contains: filters.brand,
+                mode: "insensitive"
+            }
+        }
+
+        if (filters?.minPrice) {
+            where.pricePerKg = { gte: filters.minPrice }
+        }
+
+        if (filters?.maxPrice) {
+            where.pricePerKg = { ...where.pricePerKg, lte: filters.maxPrice }
+        }
+
+        const products = await prisma.product.findMany({
+            where,
             include: {
                 category: {
                     select: {
@@ -22,11 +44,11 @@ export class PrismaProductRepository {
                     }
                 }
             }
-        });
+        })
 
-        this.logger.info(`Encontrados ${data.length} produtos.`);
+        this.logger.info(`Encontrados ${products.length} produtos.`);
 
-        return data;
+        return products;
     }
 
     async findById(id: string): Promise<any | null> {
