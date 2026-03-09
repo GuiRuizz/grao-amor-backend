@@ -1,8 +1,7 @@
 import { Router } from "express";
 
-import { createProductUseCase, getAllProductsUseCase, getProductByIdUseCase, updateProductUseCase, deleteProductUseCase } from "../products/factories/ProductUsecaseFactory.js";
 import { authMiddleware, roleMiddleware } from "../auth/infrastructure/http/controllers/middleware/authMiddleware.js";
-import { createCategoryUseCase, deleteCategoryUseCase, getAllCategoriesUseCase, getCategoryByIdUseCase, updateCategoryUseCase } from "../categories/factories/ProductUsecaseFactory.js";
+import { createCategoryUseCase, deleteCategoryUseCase, getAllCategoriesUseCase, getCategoryByIdUseCase, updateCategoryUseCase } from "../categories/factories/CategoryUsecaseFactory.js";
 import { CategoryController } from "../categories/infrastructure/http/controllers/CategoryController.js";
 
 
