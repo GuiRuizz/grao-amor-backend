@@ -9,6 +9,7 @@ import { requestLogger } from "./utils/middleware/requestLogger.js";
 import authRoutes from "./api/authRoutes.js";
 import categoryRoutes from "./api/categoryRoutes.js";
 import cartRoutes from "./api/cartRoutes.js";
+import orderRoutes from "./api/orderRoutes.js";
 
 const app = express();
 const logger = new Logger("Server");
@@ -23,6 +24,8 @@ app.use(requestLogger);
 app.use("/v1/products", productRoutes);
 
 app.use("/v1/categories", categoryRoutes);
+
+app.use("/v1/orders", orderRoutes);
 
 app.use("/v1/cart", cartRoutes);
 

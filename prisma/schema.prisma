@@ -25,8 +25,10 @@ model Product {
 
   categoryId String
   category   Category   @relation(fields: [categoryId], references: [id])
+
   cartItems  CartItem[]
-}
+  orderItems OrderItem[]
+} 
 
 model User {
   id        String   @id @default(uuid())
@@ -38,9 +40,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // relação com RefreshToken
   refreshTokens RefreshToken[]
   carts         Cart[]
+
+  orders        Order[]
 }
 
 model RefreshToken {
@@ -78,4 +81,48 @@ model CartItem {
   productId String
   product   Product @relation(fields: [productId], references: [id])
   quantity  Int
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+
+  paymentMethod PaymentMethod
+  status        OrderStatus @default(PENDING)
+
+  total     Float
+  items     OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity  Int
+  price     Float
+}
+
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PAYPAL
+  PIX
 }
