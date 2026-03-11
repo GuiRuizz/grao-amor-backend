@@ -121,8 +121,8 @@ enum OrderStatus {
 }
 
 enum PaymentMethod {
-  CREDIT_CARD
-  DEBIT_CARD
-  PAYPAL
-  PIX
+  credit_card
+  debit_card
+  pix
+  paypal
 }

@@ -10,6 +10,7 @@ import authRoutes from "./api/authRoutes.js";
 import categoryRoutes from "./api/categoryRoutes.js";
 import cartRoutes from "./api/cartRoutes.js";
 import orderRoutes from "./api/orderRoutes.js";
+import paymentRoutes from "./api/paymentRoutes.js";
 
 const app = express();
 const logger = new Logger("Server");
@@ -21,7 +22,12 @@ app.get("/teste", (req, res) => {
 });
 app.use(requestLogger);
 // Prefixo /v1 para versionamento da API
+
 app.use("/v1/products", productRoutes);
+
+app.use("/v1/payments", paymentRoutes);
+
+app.use("/v1/categories", categoryRoutes);
 
 app.use("/v1/categories", categoryRoutes);
 
