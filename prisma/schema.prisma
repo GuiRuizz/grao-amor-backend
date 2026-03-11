@@ -94,6 +94,8 @@ model Order {
   total     Float
   items     OrderItem[]
 
+  payments  Payment[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -110,6 +112,30 @@ model OrderItem {
   price     Float
 }
 
+model Payment {
+  id            String   @id @default(uuid())
+
+  orderId       String
+  order         Order    @relation(fields: [orderId], references: [id])
+
+  provider      String   // ex: "mercadopago"
+  providerRef   String?  // id do pagamento/preference no gateway
+
+  amount        Float
+  status        PaymentStatus @default(PENDING)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELED
+}
 
 enum OrderStatus {
   PENDING

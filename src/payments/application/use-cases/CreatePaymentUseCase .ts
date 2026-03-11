@@ -1,17 +1,21 @@
 import { MercadoPagoConfig, Preference } from "mercadopago";
 import type { IOrdersRepository } from "../../../orders/domain/repositories/IOrdersRepository.js";
 import type { IUserRepository } from "../../../users/domain/repositories/IUserRepository.js";
+import type { IProductRepository } from "../../../products/domain/repositories/IProductRepository.js";
+import type { IPaymentsRepository } from "../../domain/repositories/IPaymentRepository.js";
 import { AppError } from "../../../utils/AppError.js";
 import { Logger } from "../../../utils/Logger.js";
-import type { IProductRepository } from "../../../products/domain/repositories/IProductRepository.js";
+import { Payment } from "../../domain/entities/Payment.js";
+import { PaymentStatus } from "../../../../generated/prisma/enums.js";
 
+const logger = new Logger("CreatePaymentUseCase");
 
-const logger = new Logger("PaymentUseCase");
 export class CreatePaymentUseCase {
     constructor(
         private orderRepository: IOrdersRepository,
         private userRepository: IUserRepository,
         private productRepository: IProductRepository,
+        private paymentRepository: IPaymentsRepository,
         private client: MercadoPagoConfig,
     ) { }
 
@@ -20,12 +24,13 @@ export class CreatePaymentUseCase {
         const order = await this.orderRepository.findById(orderId);
         const user = await this.userRepository.findById(userId);
 
-
         if (!order) {
             throw new AppError("Pedido não encontrado");
         }
 
-        const preference = new Preference(this.client);
+        if (!user) {
+            throw new AppError("Usuário não encontrado");
+        }
 
         const products = await Promise.all(
             order.items.map(item => this.productRepository.findById(item.productId))
@@ -38,20 +43,27 @@ export class CreatePaymentUseCase {
             unit_price: item.price
         }));
 
+        const existingPayment = await this.paymentRepository.findPendingByOrderId(order.id);
+
+        if (existingPayment) {
+            logger.info("Payment already exists");
+
+            return {
+                alreadyExists: true,
+                message: "Pagamento já criado",
+                paymentId: existingPayment.id
+            };
+        }
+
+        const preference = new Preference(this.client);
 
         const payment = await preference.create({
             body: {
                 items,
                 external_reference: order.id,
                 payer: {
-                    email: user?.email
-                },
-                back_urls: {
-                    success: "https://imgs.search.brave.com/UIZZUAnucZCUIPZz85JJfum69sYc4A7LgH8pxsGjO3w/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93YWxs/cGFwZXJzLmNvbS9p/bWFnZXMvaGQvbW90/aXZhdGlvbmFsLXN1/Y2Nlc3MtcXVvdGUt/MWYwaTE1bzM5am8y/Nnoyby5qcGc",
-                    pending: "https://imgs.search.brave.com/odz3ftuUPON2a5CzeBK3fPpDB1aESjnLjML0MO9WZrA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9kaWdp/dGFsc3lub3BzaXMu/Y29tL3dwLWNvbnRl/bnQvdXBsb2Fkcy8y/MDE2LzA2L2xvYWRp/bmctYW5pbWF0aW9u/cy1wcmVsb2FkZXIt/Z2lmcy11aS11eC1l/ZmZlY3RzLTE4Lmdp/Zg.gif",
-                    failure: "https://imgs.search.brave.com/v9-UkFy10pblKTXc2jacmMxxywFaVcD-7nP_mP7XBsQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS50ZW5vci5jb20v/dDhqSUVmZ1RlSVlB/QUFBTS9taW5laHV0/LW1oLmdpZg.gif"
+                    email: user.email
                 }
-
             }
         });
 
@@ -59,6 +71,23 @@ export class CreatePaymentUseCase {
             throw new AppError("Erro ao criar pagamento");
         }
 
-        return payment;
+        const newPayment = new Payment(
+            order.id,
+            "mercadopago",
+            order.value,
+            PaymentStatus.PENDING,
+            payment.id
+        );
+
+        await this.paymentRepository.create(newPayment);
+
+        logger.info(`Payment created for order ${order.id}`);
+
+        return {
+            alreadyExists: false,
+            id: payment.id,
+            init_point: payment.init_point,
+            sandbox_init_point: payment.sandbox_init_point
+        };
     }
 }
