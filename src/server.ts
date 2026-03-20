@@ -27,6 +27,8 @@ app.use("/v1/products", productRoutes);
 
 app.use("/v1/payments", paymentRoutes);
 
+app.use("/v1/uploads", express.static("public/uploads"));
+
 app.use("/v1/categories", categoryRoutes);
 
 app.use("/v1/categories", categoryRoutes);

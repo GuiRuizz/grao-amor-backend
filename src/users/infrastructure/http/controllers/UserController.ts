@@ -68,7 +68,6 @@ export class UserController {
     }
 
     async update(req: Request, res: Response) {
-
         const id = req.params.id;
 
         if (!id || Array.isArray(id)) {
@@ -76,14 +75,23 @@ export class UserController {
             return res.status(400).json({ message: "ID inválido" });
         }
 
-        const data = req.body; // { name, price, description ... }
+        const data = req.body;
+
+        // 👇 pega o arquivo do multer
+        const file = req.file as Express.Multer.File | undefined;
+
+        if (file) {
+            data.profilePhoto = `/uploads/avatars/${file.filename}`;
+        }
 
         const updatedUser = await this.updateUserUseCase.execute(id, data);
 
         logger.info(`User with ID ${id} updated successfully`);
-        return res.json({ message: "Usuário atualizado com sucesso", user: toUserResponse(updatedUser!) });
 
-
+        return res.json({
+            message: "Usuário atualizado com sucesso",
+            user: toUserResponse(updatedUser!)
+        });
     }
 
     async delete(req: Request, res: Response) {

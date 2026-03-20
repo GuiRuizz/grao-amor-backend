@@ -6,6 +6,7 @@ export function toUserResponse(user: User): UserResponseDTO {
     return {
         id: user.id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        profilePhoto: user.profilePhoto!
     };
 }

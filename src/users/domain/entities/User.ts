@@ -7,6 +7,7 @@ export class User {
         public name: string,
         public email: string,
         public password: string,
+        public profilePhoto?: string | null,
         public type: "USER" | "ADMIN" = "USER", // sempre default
         public isActive: boolean = true,
         public createdAt: Date = new Date(),

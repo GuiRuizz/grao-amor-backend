@@ -3,6 +3,7 @@ import type { IUserRepository } from "../../domain/repositories/IUserRepository.
 import { Logger } from "../../../utils/Logger.js";
 import type { UserResponseDTO } from "../dto/UserDTO.js";
 import type { User } from "../../domain/entities/User.js";
+import { AppError } from "../../../utils/AppError.js";
 
 const logger = new Logger("UpdateUserUseCase");
 export class UpdateUserUseCase {
@@ -13,31 +14,42 @@ export class UpdateUserUseCase {
     }
 
     async execute(id: string, data: UserResponseDTO): Promise<User | null> {
-        // Validação básica
         if (!id || typeof id !== "string") {
             logger.warn("Invalid ID provided");
-            throw new Error("ID inválido.");
+            throw new AppError("ID inválido.");
         }
 
         if (!data || Object.keys(data).length === 0) {
             logger.warn("No data provided for update");
-            throw new Error("Nenhum dado para atualizar.");
+            throw new AppError("Nenhum dado para atualizar.");
         }
 
-        // Busca o usuário no repositório
         const user = await this.userRepo.findById(id);
 
         if (!user) {
             logger.info(`User with ID ${id} not found`);
-            throw new Error("Usuário não encontrado.");
+            throw new AppError("Usuário não encontrado.");
         }
 
-        // Atualiza os campos do usuário
-        const updatedUser = { ...user, ...data };
+        if (data.email && data.email !== user.email) {
+            const existingUser = await this.userRepo.findByEmail(data.email);
 
-        // Salva no repositório
-        await this.userRepo.update(id, updatedUser);
+            if (existingUser) {
+                throw new AppError("Email já está em uso.");
+            }
+        }
+
+        // 👇 só atualiza campos permitidos
+        const updatedData: Partial<User> = {
+            name: data.name ?? user.name,
+            email: data.email ?? user.email,
+            profilePhoto: data.profilePhoto ?? user.profilePhoto,
+        };
+
+        const updatedUser = await this.userRepo.update(id, updatedData);
+
         logger.info(`User with ID ${id} updated successfully`);
+
         return updatedUser;
     }
 }

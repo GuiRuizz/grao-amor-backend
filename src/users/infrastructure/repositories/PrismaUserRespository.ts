@@ -33,6 +33,7 @@ export class PrismaUserRepository implements IUserRepository {
             user.name,
             user.email,
             user.password,
+            user.profilePhoto!,
             user.type as "USER" | "ADMIN",
             user.isActive,
             user.createdAt,
@@ -54,12 +55,13 @@ export class PrismaUserRepository implements IUserRepository {
             user.name,
             user.email,
             user.password,
+            user.profilePhoto!,
             user.type as "USER" | "ADMIN",
             user.isActive,
             user.createdAt,
             user.updatedAt,
             user.id,
-            
+
         );
     }
 
@@ -73,6 +75,7 @@ export class PrismaUserRepository implements IUserRepository {
                 u.name,
                 u.email,
                 u.password,
+                u.profilePhoto!,
                 u.type as "USER" | "ADMIN",
                 u.isActive,
                 u.createdAt,
@@ -91,15 +94,22 @@ export class PrismaUserRepository implements IUserRepository {
         logger.info(`User with ID ${id} deleted successfully`);
     }
 
-    async update(id: string, user: User): Promise<void> {
-        await prisma.user.update({
+    async update(id: string, user: Partial<User>): Promise<User> {
+        const updatedUser = await prisma.user.update({
             where: { id },
             data: {
-                name: user.name,
-                email: user.email,
+                ...(user.name && { name: user.name }),
+                ...(user.email && { email: user.email }),
+                ...(user.profilePhoto && { profilePhoto: user.profilePhoto }),
             }
         });
+
         logger.info(`User with ID ${id} updated successfully`);
+
+        return {
+            ...updatedUser,
+            type: updatedUser.type as "ADMIN" | "USER", // 👈 resolve o erro
+        };
     }
 
     async updatePassword(id: string, password: string): Promise<void> {
