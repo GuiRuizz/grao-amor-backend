@@ -8,6 +8,7 @@ import { UpdateUserUseCase } from "../application/use-cases/UpdateUserUseCase.js
 import { Logger } from "../../utils/Logger.js";
 import { PrismaUserRepository } from "../infrastructure/repositories/PrismaUserRespository.js";
 import { UpdatePasswordUserUseCase } from "../application/use-cases/UpdatePasswordUserUseCase.js";
+import { GetMeUseCase } from "../application/use-cases/GetMeUserUseCase.js";
 
 
 // Cria uma instância do repositório
@@ -22,5 +23,6 @@ export const updateUserUseCase = new UpdateUserUseCase(userRepository);
 export const deleteUserUseCase = new DeleteUserUseCase(userRepository);
 export const getUserByEmailUseCase = new GetUserByEmailUseCase(userRepository);
 export const updatePasswordUserUseCase = new UpdatePasswordUserUseCase(userRepository);
+export const getMeUserUseCase = new GetMeUseCase(userRepository);
 
 logger.info("User Use Cases initialized successfully");

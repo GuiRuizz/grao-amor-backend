@@ -8,6 +8,7 @@ import type { UpdateUserUseCase } from "../../../application/use-cases/UpdateUse
 import { Logger } from "../../../../utils/Logger.js"
 import { toUserResponse } from "../../../application/dto/MapperUser.js"
 import type { GetUserByEmailUseCase } from "../../../application/use-cases/GetByEmailUserUseCase.js"
+import type { GetMeUseCase } from "../../../application/use-cases/GetMeUserUseCase.js"
 const logger = new Logger("UserController");
 export class UserController {
 
@@ -17,7 +18,8 @@ export class UserController {
         private getUserByIdUseCase: GetUserByIdUseCase,
         private updateUserUseCase: UpdateUserUseCase,
         private deleteUserUseCase: DeleteUserUseCase,
-        private getUserByEmailUseCase: GetUserByEmailUseCase
+        private getUserByEmailUseCase: GetUserByEmailUseCase,
+        private getMeUseCase: GetMeUseCase
     ) {
     }
 
@@ -92,6 +94,24 @@ export class UserController {
             message: "Usuário atualizado com sucesso",
             user: toUserResponse(updatedUser!)
         });
+    }
+
+    async me(req: Request, res: Response) {
+        // Supondo que você já tenha middleware JWT que coloca o userId no request
+        const userId = (req as any).userId as string;
+
+        if (!userId) {
+            return res.status(401).json({ message: "Usuário não autenticado" });
+        }
+
+        const user = await this.getMeUseCase.execute(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "Usuário não encontrado" });
+        }
+
+        return res.json(toUserResponse(user));
+
     }
 
     async delete(req: Request, res: Response) {

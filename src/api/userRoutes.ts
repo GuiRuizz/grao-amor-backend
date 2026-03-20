@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { UserController } from "../users/infrastructure/http/controllers/UserController.js";
-import { createUserUseCase, getAllUsersUseCase, getUserByIdUseCase, updateUserUseCase, deleteUserUseCase, getUserByEmailUseCase } from "../users/factories/UserUsecaseFactory.js";
+import { createUserUseCase, getAllUsersUseCase, getUserByIdUseCase, updateUserUseCase, deleteUserUseCase, getUserByEmailUseCase, getMeUserUseCase } from "../users/factories/UserUsecaseFactory.js";
 import { authMiddleware, roleMiddleware } from "../auth/infrastructure/http/controllers/middleware/authMiddleware.js";
 import { uploadAvatar } from "../utils/middleware/upload.js";
 
@@ -13,12 +13,14 @@ const userController = new UserController(
     updateUserUseCase,
     deleteUserUseCase,
     getUserByEmailUseCase,
+    getMeUserUseCase,
 );
 
 // Rotas
 router.post("/", (req, res) => userController.create(req, res));
 
 router.get("/", authMiddleware, roleMiddleware(["ADMIN"]), (req, res) => userController.getAll(req, res));
+router.get("/me", authMiddleware, userController.me.bind(userController));
 router.get("/:id", authMiddleware, (req, res) => userController.getById(req, res));
 router.get("/email/:email", authMiddleware, (req, res) => userController.getByEmail(req, res));
 router.patch("/:id", authMiddleware, uploadAvatar.single("avatar"), (req, res) => userController.update(req, res));
