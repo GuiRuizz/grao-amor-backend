@@ -98,7 +98,9 @@ export class UserController {
 
     async me(req: Request, res: Response) {
         // Supondo que você já tenha middleware JWT que coloca o userId no request
-        const userId = (req as any).userId as string;
+        const userId = req.userId;
+
+        logger.info(`UserID:   ${userId}`);
 
         if (!userId) {
             return res.status(401).json({ message: "Usuário não autenticado" });
@@ -109,6 +111,9 @@ export class UserController {
         if (!user) {
             return res.status(404).json({ message: "Usuário não encontrado" });
         }
+
+        logger.info(`COOKIES:   ${req.cookies}`);
+
 
         return res.json(toUserResponse(user));
 
