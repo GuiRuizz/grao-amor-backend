@@ -14,32 +14,32 @@ import paymentRoutes from "./api/paymentRoutes.js";
 
 const app = express();
 const logger = new Logger("Server");
+const API_PREFIX = process.env.API_PREFIX;
+
 app.use(cors());
 app.use(express.json());
 
 app.get("/teste", (req, res) => {
-    res.send("Servidor funcionando");
+    res.send("Servidor funcionando"); 
 });
 app.use(requestLogger);
 // Prefixo /v1 para versionamento da API
 
-app.use("/v1/products", productRoutes);
+app.use(`${API_PREFIX}products`, productRoutes);
 
-app.use("/v1/payments", paymentRoutes);
+app.use(`${API_PREFIX}payments`, paymentRoutes);
 
-app.use("/v1/uploads", express.static("public/uploads"));
+app.use(`${API_PREFIX}uploads`, express.static("public/uploads"));
 
-app.use("/v1/categories", categoryRoutes);
+app.use(`${API_PREFIX}categories`, categoryRoutes);
 
-app.use("/v1/categories", categoryRoutes);
+app.use(`${API_PREFIX}orders`, orderRoutes);
 
-app.use("/v1/orders", orderRoutes);
+app.use(`${API_PREFIX}cart`, cartRoutes);
 
-app.use("/v1/cart", cartRoutes);
+app.use(`${API_PREFIX}users`, userRoutes);
 
-app.use("/v1/users", userRoutes);
-
-app.use("/v1/auth", authRoutes);
+app.use(`${API_PREFIX}auth`, authRoutes);
 
 app.use(errorHandler);
 
